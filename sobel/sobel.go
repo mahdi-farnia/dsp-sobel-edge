@@ -17,7 +17,10 @@ func SobelOnJpeg(imageFile *os.File) (writer func(outfile *os.File) error, _ err
 	// new image with same size
 	newImage := image.NewRGBA(img.Bounds())
 
-	readImageFn(img, newImage, sobel)
+	readImageFn(img, newImage, luminanceOp)
+	readImageFn(newImage, newImage, boxBlurOp)
+	readImageFn(newImage, newImage, mapMagnitudeOp)
+	readImageFn(newImage, newImage, sobelOp)
 
 	return func(outfile *os.File) error {
 		return jpeg.Encode(outfile, newImage, &jpeg.Options{Quality: jpeg.DefaultQuality})
@@ -37,25 +40,35 @@ func readImageFn(img image.Image, newImg *image.RGBA, op OperatorFn) {
 	}
 }
 
-// TODO(mahdi-farnia): add blurring & sobel operator (matrix multiplication + hardcode kernel values + find threshold + ...)
-func sobel(img image.Image, x, y int) color.Color {
-	r, g, b, a := img.At(x, y).RGBA()
+var maxMag uint8
 
-	// apply gray scale & scaledown to uin8 color
-	return luminanceGrayScale(r, g, b, a)
-}
+func sobelOp(img image.Image, x, y int) color.Color {
+	if maxMag == 0 {
+		for _, m := range img.(*image.RGBA).Pix {
+			if m > maxMag {
+				maxMag = m
+			}
+		}
+	}
+	currentWindow := getCurrentWindow(img, x, y)
 
-// luminanceGrayScale applies luminance gray scale conversion
-func luminanceGrayScale(r, g, b, a uint32) color.Color {
-	const (
-		redFactor   = 0.299
-		greenFactor = 0.587
-		blueFactor  = 0.114
-		// scaleDownFactor is the number that colors were pre-scaled before.
-		// we divide by this factor to convert to uint8
-		scaleDownFactor = 255
-	)
-	intensity := (redFactor*float64(r) + greenFactor*float64(g) + blueFactor*float64(b)) / scaleDownFactor
+	// var acc int
+	// for _, c := range currentWindow {
+	// 	r, _, _, _ := c.RGBA()
+	// 	acc += int(r >> 8) // sum intensities
+	// }
 
-	return color.RGBA{R: uint8(intensity), G: uint8(intensity), B: uint8(intensity), A: uint8(a/255 - 2)}
+	// threshold := uint32(float64(acc) / 9.0) // get mean
+	const threshold uint8 = 120
+
+	// current pixel intensity
+	magnitude, _, _, _ := currentWindow[4].RGBA()
+	magnitude >>= 8
+
+	tmpMag := uint8(float64(magnitude) / float64(maxMag) * 255)
+	if threshold > tmpMag {
+		return color.Gray{Y: 0}
+	}
+
+	return color.Gray{Y: 255}
 }
