@@ -11,7 +11,7 @@ RUN make build
 # Run Stage
 FROM alpine
 
-COPY --from=builder ./sobel_edge /sobel_edge/main
+COPY --from=builder /workdir/sobel_edge /sobel_edge/main
 COPY ./assets/image.jpg /sobel_edge/image.jpg
 
 RUN chmod +x /sobel_edge/main
