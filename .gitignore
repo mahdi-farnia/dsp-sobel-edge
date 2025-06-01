@@ -1,0 +1,6 @@
+# Finder metadata
+.DS_Store
+# Executable
+/sobel_edge
+# tmp folder is the local folder that i used to store test images
+tmp
