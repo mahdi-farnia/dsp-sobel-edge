@@ -10,7 +10,8 @@
       "request": "launch",
       "mode": "auto",
       "program": "./cmd/sobel_edge/main.go",
-      "args": ["${cwd}/assets/image.jpg", "${cwd}/tmp.jpg"]
+      "args": ["${cwd}/assets/image.jpg", "${cwd}/tmp.jpg", "0"],
+      "output": "${cwd}/sobel_edge"
     }
   ]
 }

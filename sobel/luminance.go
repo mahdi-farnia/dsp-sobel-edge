@@ -5,12 +5,12 @@ import (
 	"image/color"
 )
 
-func luminanceOp(img image.Image, x, y int) color.Color {
-	return luminanceGrayScale(getPixelColor(img, x, y))
+func luminanceOp(img image.Image, x, y int) color.Gray16 {
+	return luminanceGrayScale(img.At(x, y))
 }
 
 // luminanceGrayScale applies luminance gray scale conversion
-func luminanceGrayScale(c color.Color) color.Color {
+func luminanceGrayScale(c color.Color) color.Gray16 {
 	r, g, b, _ := c.RGBA()
 
 	const (
@@ -18,7 +18,7 @@ func luminanceGrayScale(c color.Color) color.Color {
 		greenFactor = 0.587
 		blueFactor  = 0.114
 	)
-	intensity := uint32(redFactor*float64(r)+greenFactor*float64(g)+blueFactor*float64(b)) >> 8
+	intensity := redFactor*float64(r) + greenFactor*float64(g) + blueFactor*float64(b)
 
-	return color.Gray{Y: uint8(intensity)}
+	return color.Gray16{Y: uint16(intensity)}
 }

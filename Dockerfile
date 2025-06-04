@@ -6,7 +6,7 @@ COPY . .
 
 # building executable
 RUN apk add --no-cache make
-RUN make build
+RUN make build_linux
 
 # Run Stage
 FROM alpine

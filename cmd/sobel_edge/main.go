@@ -3,7 +3,7 @@ Apply Sobel Operator On Image For Edge Detection
 
 usage:
 
-	sobel_edge <img-path>.jpg <output-path>.jpg
+	sobel_edge <img-path>.jpg <output-path>.jpg <threshold>
 */
 package main
 
@@ -11,14 +11,15 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/mahdi-farnia/dsp-sobel-edge/sobel"
 )
 
-const kFmtUsageString = "usage: %v <img-file>.jpg <output-path>.jpg"
+const kFmtUsageString = "usage: %v <img-file>.jpg <output-path>.jpg <threshold>"
 
 func main() {
-	if len(os.Args) != 3 {
+	if len(os.Args) != 4 {
 		log.Fatalf(kFmtUsageString, os.Args[0])
 	}
 
@@ -34,7 +35,12 @@ func main() {
 	//#region apply sobel
 	fmt.Println("> Applying sobel operator on image:", inFilename)
 
-	writer, err := sobel.SobelOnJpeg(inFile)
+	threshold, err := strconv.Atoi(os.Args[3])
+	if err != nil {
+		log.Fatalf("invalid threshold: %v", threshold)
+	}
+
+	writer, err := sobel.SobelOnJpeg(inFile, uint8(threshold))
 	if err != nil {
 		log.Fatal(err)
 	}
