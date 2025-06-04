@@ -10,7 +10,7 @@ build_linux: vet
 	GOOS=linux GOARCH=amd64 go build -o $(OUT) $(ENTRY)
 
 build_win: vet
-	GOOS=windows GOARCH=amd64 go build -o $(OUT) $(ENTRY)
+	GOOS=windows GOARCH=amd64 go build -o $(OUT).exe $(ENTRY)
 
 build_mac: vet
 	GOOS=darwin GOARCH=arm64 go build -o $(OUT) $(ENTRY)
